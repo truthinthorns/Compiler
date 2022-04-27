@@ -1,0 +1,30 @@
+program
+   var SMALLER as int ;
+   var BIGGER as int ;
+   var TEMP as int ;
+   var B as bool ;
+begin
+   BIGGER := readInt ;
+   SMALLER := readInt ;
+   %TEMP := ( 1232 + 1 ) div ( 1232 div 823 ) ;
+   B := true ;
+
+   if false then
+      TEMP := SMALLER ;
+      %TEMP1 := 2147483648 ;
+      SMALLER := BIGGER ;
+      BIGGER := TEMP ;
+   end ;
+
+   while false do
+      BIGGER := BIGGER - SMALLER ;
+
+      if SMALLER > BIGGER then
+         TEMP := SMALLER ;
+         SMALLER := BIGGER ;
+         BIGGER := TEMP ;
+      end ;
+   end ;
+   writeInt BIGGER ;
+end
+
