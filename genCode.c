@@ -214,24 +214,33 @@ void genCodeAssignment(struct Asgnmt * a)
             if(a->e) //expression field is valid
             {
                 printf("%s = ",a->id);
-                genCodeExpr2(a->e,1,1);
+                genCodeExpr2(a->e,1,2);
                 printf(";");
                 char * tm;
                 genCodeExpr2(a->e,2,1);
                 tm=malloc(strlen(fHelper)+1);
                 strcpy(tm,fHelper);
-                printf("%s\n",tm);
                 bool valid = false;
                 if(strcmp(tm,"true")==0 || strcmp(tm,"false")==0 )
                     valid = true;
                 if(!valid){
-                struct ST_Entry * e = findEntry(tm);
-                if(e!=NULL)
-                    if(e->type==2 && e->declared)
+                    //printf("Hits first !valid\n");
+                    struct ST_Entry * e = findEntry(tm);
+                    if(e!=NULL){
+                        if(e->type==2 && e->declared)
                         valid = true;    
-                //error: #2
-                else if(!genCodeExpr(a->e,2))
-                    valid = true;
+                    }
+                    else{
+                        for(int i = 0; i< strlen(tm);i++){
+                            if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='='){
+                                valid = true;
+                                break;
+                            }
+                        }
+                    }
+                    //error: #2
+                    if(!genCodeExpr(a->e,2))
+                        valid = true;
                 }
                 if(!valid){
                     printf("\nWARNING: Invalid assignment to boolean variable.\n");
@@ -326,7 +335,7 @@ void genCodeWhile(struct While_stmt * w)
     bool valid = false;
     for(int i = 0; i < strlen(tm); i++)
     {
-        if(tm[i]=='<' ||tm[i]=='>' ||tm[i]=='!=' ||tm[i]=='==' ||tm[i]=='>=' ||tm[i]=='<='){
+        if(tm[i]=='<' ||tm[i]=='>' ||tm[i]=='!' ||tm[i]=='='){
             valid = true;
             break;
         }
@@ -480,10 +489,11 @@ void genCodeFactor2(struct Fact * f, int opt, int opt2)
             }
             break;
         case 3:
+            //printf("\nbool val:%d\n",f->boollitl);
             if(opt==1)
-                printf("%s", f->boollitl==0?"true":"false");
+                printf("%s", f->boollitl==0?"false":"true");
             else
-                strcat(fHelper,f->boollitl==0?"true":"false");
+                strcat(fHelper,f->boollitl==0?"false":"true");
             break;
         case 4:
             if(opt==1)
@@ -541,6 +551,7 @@ bool checkOperandTypeTerm(struct Trm * t)
     {
         if(t->single->type != 2 && (t->single->type == 1 && findEntry(t->single->identr)->type != 1))
             return false;
+            
     }
     else
     {
@@ -561,10 +572,12 @@ bool genCodeExpr(struct Expr * e, int opt)
     }
     else
     {
+        //printf("Hits the else");
         if(opt==1)
             return false;
         else
             return false;
+        
     }
     return true;
 }
@@ -751,6 +764,8 @@ void genCodeTerm4(struct Trm * t)
                     printf("if(");
                     for(int i = 0; i < strlen(tm); i++)
                     {
+                        if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='=')
+                            break;
                         if(tm[i]=='%' || tm[i]=='/'){
                             enc++;
                             if(numOP2==1 || enc==1){
@@ -765,6 +780,8 @@ void genCodeTerm4(struct Trm * t)
                     next = false;
                     for(int i = 0; i < strlen(tm); i++)
                     {
+                        if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='=')
+                            break;
                         if(tm[i]!='%' && tm[i]!='/')
                             printf("%c",tm[i]);
                         else{
@@ -775,6 +792,8 @@ void genCodeTerm4(struct Trm * t)
                     enc=0;
                     for(int i = 0; i < strlen(tm); i++)
                     {
+                        if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='=')
+                            break;
                         if(tm[i]=='%' || tm[i]=='/'){
                             enc++;
                             if(numOP2==1 || enc==1){
@@ -793,6 +812,8 @@ void genCodeTerm4(struct Trm * t)
                     printf("if(!(");
                     for(int i = 0; i < strlen(tm); i++)
                     {
+                        if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='=')
+                            break;
                         if(tm[i]!='%' && tm[i]!='/')
                             printf("%c",tm[i]);
                         else{
@@ -802,6 +823,8 @@ void genCodeTerm4(struct Trm * t)
                     printf(">-1 && ");
                     for(int i = 0; i < strlen(tm); i++)
                     {
+                        if(tm[i]=='<'||tm[i]=='>'||tm[i]=='!'||tm[i]=='=')
+                            break;
                         if(tm[i]=='%' || tm[i]=='/'){
                             enc++;
                             if(numOP2==1 || enc==1){
